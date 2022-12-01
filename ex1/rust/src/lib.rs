@@ -35,25 +35,25 @@ mod tests {
 
     #[test]
     fn test_part_one() {
-        let input = include_str!("../test.input");
+        let input = include_str!("../../test.input");
         assert_eq!(sum_largest(input), 24000);
     }
 
     #[test]
     fn part_one() {
-        let input = include_str!("../input");
+        let input = include_str!("../../input");
         assert_eq!(sum_largest(input), 66616);
     }
 
     #[test]
     fn test_part_two() {
-        let input = include_str!("../test.input");
+        let input = include_str!("../../test.input");
         assert_eq!(sum_largest_three(input), 45000);
     }
 
     #[test]
     fn part_two() {
-        let input = include_str!("../input");
+        let input = include_str!("../../input");
         assert_eq!(sum_largest_three(input), 199172);
     }
 }
