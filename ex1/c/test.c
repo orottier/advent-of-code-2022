@@ -1,14 +1,29 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+void insert_sorted(int * sorted, size_t len, int value) {
+    for (int i = 0; i < len; i++) {
+        if (sorted[i] < value) {
+            if (len - i > 1) {
+                memmove(sorted + sizeof(int), sorted, len - i);
+            }
+
+            sorted[i] = value;
+
+            return;
+        }
+    }
+}
 
 int main(void)
 {
     FILE * fp;
     char * line = NULL;
     size_t len = 0;
-    size_t current_sum = 0;
-    size_t max = 0;
-    size_t three_max[3] = {0, 0, 0};
+    int current_sum = 0;
+    int max = 0;
+    int three_max[3] = {0, 0, 0};
     ssize_t read;
 
     fp = fopen("../input", "r");
@@ -24,22 +39,13 @@ int main(void)
                 max = current_sum;
             }
 
-            // poor man's sort
-            if (current_sum > three_max[0] || current_sum > three_max[1] || current_sum > three_max[2]) {
-                if (three_max[0] <= three_max[1] && three_max[0] <= three_max[2]) {
-                    three_max[0] = current_sum;
-                } else if (three_max[1] <= three_max[0] && three_max[1] <= three_max[2]) {
-                    three_max[1] = current_sum;
-                } else {
-                    three_max[2] = current_sum;
-                }
-            }
+            insert_sorted(three_max, 3, current_sum);
 
             current_sum = 0;
             continue;
         }
 
-        size_t val = atoi(line);
+        int val = atoi(line);
         //printf("value: %zu\n", val);
         current_sum += val;
     }
@@ -49,12 +55,12 @@ int main(void)
         free(line);
     }
 
-    printf("max: %zu\n", max);
+    printf("max: %d\n", max);
 
-    printf("max[0]: %zu\n", three_max[0]);
-    printf("max[1]: %zu\n", three_max[1]);
-    printf("max[2]: %zu\n", three_max[2]);
-    printf("max of three: %zu\n", three_max[0] + three_max[1] + three_max[2]);
+    printf("max[0]: %d\n", three_max[0]);
+    printf("max[1]: %d\n", three_max[1]);
+    printf("max[2]: %d\n", three_max[2]);
+    printf("max of three: %d\n", three_max[0] + three_max[1] + three_max[2]);
 
     exit(EXIT_SUCCESS);
 }
