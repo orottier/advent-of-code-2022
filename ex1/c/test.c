@@ -8,7 +8,7 @@ int main(void)
     size_t len = 0;
     size_t current_sum = 0;
     size_t max = 0;
-    size_t * three_max = malloc(sizeof(size_t) * 3);
+    size_t three_max[3] = {0, 0, 0};
     ssize_t read;
 
     fp = fopen("../input", "r");
@@ -55,7 +55,6 @@ int main(void)
     printf("max[1]: %zu\n", three_max[1]);
     printf("max[2]: %zu\n", three_max[2]);
     printf("max of three: %zu\n", three_max[0] + three_max[1] + three_max[2]);
-    free(three_max);
 
     exit(EXIT_SUCCESS);
 }
