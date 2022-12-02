@@ -1,44 +1,49 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// opponent: A = rock, B = paper, C = scissor
-// me: X = rock (1), Y = paper (2), Z = scissor (3)
-// outcome: X = lose, Y = draw, Z = win
+enum pick { ROCK = 'A', PAPER = 'B', SCISSORS = 'C' };
+enum outcome { LOSE = 'X', DRAW = 'Y', WIN = 'Z' };
 
-unsigned int score_game(char other, char me) {
+unsigned int score_game(enum pick other, enum pick me) {
     unsigned int score = 0;
 
     switch (me) {
-        case 'X':
+        case ROCK:
             score += 1;
             switch (other) {
-                case 'A':
+                case ROCK:
                     score += 3;
                     break;
-                case 'C':
+                case SCISSORS:
                     score += 6;
+                    break;
+                default:
                     break;
             }
             break;
-        case 'Y':
+        case PAPER:
             score += 2;
             switch (other) {
-                case 'A':
+                case ROCK:
                     score += 6;
                     break;
-                case 'B':
+                case PAPER:
                     score += 3;
+                    break;
+                default:
                     break;
             }
             break;
-        case 'Z':
+        case SCISSORS:
             score += 3;
             switch (other) {
-                case 'B':
+                case PAPER:
                     score += 6;
                     break;
-                case 'C':
+                case SCISSORS:
                     score += 3;
+                    break;
+                default:
                     break;
             }
             break;
@@ -49,32 +54,25 @@ unsigned int score_game(char other, char me) {
 
 unsigned int score_outcome(char other, char outcome) {
     switch (outcome) {
-        case 'X':
+        case LOSE:
             switch (other) {
-                case 'A':
-                    return score_game(other, 'Z');
-                case 'B':
-                    return score_game(other, 'X');
-                case 'C':
-                    return score_game(other, 'Y');
+                case ROCK:
+                    return score_game(other, SCISSORS);
+                case PAPER:
+                    return score_game(other, ROCK);
+                case SCISSORS:
+                    return score_game(other, PAPER);
             }
-        case 'Y':
+        case DRAW:
+            return score_game(other, other);
+        case WIN:
             switch (other) {
-                case 'A':
-                    return score_game(other, 'X');
-                case 'B':
-                    return score_game(other, 'Y');
-                case 'C':
-                    return score_game(other, 'Z');
-            }
-        case 'Z':
-            switch (other) {
-                case 'A':
-                    return score_game(other, 'Y');
-                case 'B':
-                    return score_game(other, 'Z');
-                case 'C':
-                    return score_game(other, 'X');
+                case ROCK:
+                    return score_game(other, PAPER);
+                case PAPER:
+                    return score_game(other, SCISSORS);
+                case SCISSORS:
+                    return score_game(other, ROCK);
             }
     }
 
@@ -98,11 +96,11 @@ int main(void)
     }
 
     while ((read = getline(&line, &len, fp)) != -1) {
-        char other = line[0];
-        char me = line[2];
+        enum pick other = line[0];
+        enum pick me = line[2] - ('X' - 'A');
         score_a += score_game(other, me);
 
-        char outcome = me;
+        char outcome = line[2];
         score_b += score_outcome(other, outcome);
     }
 
