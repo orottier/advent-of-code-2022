@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int main(void)
 {
@@ -14,23 +15,26 @@ int main(void)
         exit(EXIT_FAILURE);
     }
 
-    char prev[4] = {0};
+    char prev[15] = {0}; // include null terminator
     read = getline(&line, &len, fp);
     for (int i = 0; i < read; i++) {
-        prev[0] = prev[1];
-        prev[1] = prev[2];
-        prev[2] = prev[3];
-        prev[3] = line[i];
+        memmove(prev + sizeof(char), prev, 13);
+        prev[0] = line[i];
+        //printf("evaluating %s\n", prev);
 
-        if (
-                prev[0] != 0
-                && prev[0] != prev[1] && prev[0] != prev[2] && prev[0] != prev[3]
-                && prev[1] != prev[2] && prev[1] != prev[3]
-                && prev[2] != prev[3]
-        ) {
-            printf("pos: %d\n", i + 1);
-            break;
+        for (int j=0; j<14; j++) {
+            for (int k=0; k<j; k++) {
+                if (prev[j] == prev[k]) {
+                    goto cont;
+                }
+            }
         }
+
+        printf("message at %i\n", i + 1);
+        break;
+
+cont:
+        ;
     }
 
     fclose(fp);
