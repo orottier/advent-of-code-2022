@@ -60,8 +60,10 @@ int main(void)
     int num, from, to;
     while ((read = getline(&line, &len, fp)) != -1) {
         sscanf(line, "move %d from %d to %d", &num, &from, &to);
-        //printf("move %d from %d to %d\n", num, from, to);
+        printf("move %d from %d to %d\n", num, from, to);
 
+        /* CrateMover 9000 */
+        /*
         for (int i=0; i<num; i++) {
             CharLinkedList* from_item = positions[from - 1];
             //printf("now moving %c\n", from_item->c);
@@ -72,6 +74,20 @@ int main(void)
             positions[to - 1] = from_item;
             positions[to - 1]->next = to_item;
         }
+        */
+
+        /* CrateMover 9001 */
+        CharLinkedList* from_item = positions[from - 1];
+        CharLinkedList* pickup_item = positions[from - 1];
+        for (int i=1; i<num; i++) {
+            pickup_item = pickup_item->next;
+        }
+        //printf("now moving %c\n", pickup_item->c);
+        CharLinkedList* from_parent = pickup_item->next;
+        CharLinkedList* to_item = positions[to - 1];
+        positions[from - 1] = from_parent;
+        positions[to - 1] = from_item;
+        pickup_item->next = to_item;
     }
 
     fclose(fp);
