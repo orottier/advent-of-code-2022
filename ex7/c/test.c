@@ -76,6 +76,11 @@ int main(void)
             strcpy(&dir_stack[len], &line[5]);
             dir_stack[len + strlen(line) - 6] = 0;
             printf("dir stack '%s'\n", dir_stack);
+
+            char * dir_stack_clone = malloc(strlen(dir_stack) + 1);
+            strcpy(dir_stack_clone, dir_stack);
+            hashmap_set(map, &(DirSize){ .path=dir_stack_clone, .size=0 });
+
             continue;
         }
         if (strncmp(line, "dir ", 4) == 0) {
@@ -88,10 +93,7 @@ int main(void)
         strcpy(dir_stack_iter, dir_stack);
         do {
             DirSize * dirSize = hashmap_get(map, &(DirSize){ .path=dir_stack_iter });
-            if (dirSize == NULL) {
-                hashmap_set(map, &(DirSize){ .path=dir_stack_iter, .size=0 });
-                dirSize = hashmap_get(map, &(DirSize){ .path=dir_stack_iter });
-            }
+            assert(dirSize != NULL);
             dirSize->size += filesize;
 
             char * slash = strrchr(dir_stack_iter, '/');
