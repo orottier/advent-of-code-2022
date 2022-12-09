@@ -46,47 +46,60 @@ int main(void)
         exit(EXIT_FAILURE);
     }
 
-    struct hashmap *map = hashmap_new(sizeof(Position), 0, 0, 0, dirSizeHash, dirSizeCompare, NULL, NULL);
-    long hx = 0, hy = 0, tx = 0, ty = 0;
+    struct hashmap *map1 = hashmap_new(sizeof(Position), 0, 0, 0, dirSizeHash, dirSizeCompare, NULL, NULL);
+    struct hashmap *map9 = hashmap_new(sizeof(Position), 0, 0, 0, dirSizeHash, dirSizeCompare, NULL, NULL);
+
+    long x[10] = {0}, y[10] = {0};
 
     while ((read = getline(&line, &len, fp)) != -1) {
         char c;
         int d;
         sscanf(line, "%c %d", &c, &d);
 
-        int dx = 0; int dy = 0;
+        int step_x = 0; int step_y = 0;
         switch (c) {
-            case 'R': dx = 1; break;
-            case 'L': dx = -1; break;
-            case 'U': dy = 1; break;
-            case 'D': dy = -1; break;
+            case 'R': step_x = 1; break;
+            case 'L': step_x = -1; break;
+            case 'U': step_y = 1; break;
+            case 'D': step_y = -1; break;
             default: assert(0);
         }
 
         for (int i = 0; i < d; i++) {
-            hx += dx;
-            hy += dy;
+            for (int j = 0; j < 10; j++) {
+                if (j == 0) {
+                    x[0] += step_x;
+                    y[0] += step_y;
+                    continue;
+                }
 
-            int dx = hx - tx;
-            int dy = hy - ty;
-            
-            bool adjacent = dx * dx + dy * dy <= 2;
-            if (!adjacent) {
-                tx += sign(dx);
-                ty += sign(dy);
+                int dx = x[j-1] - x[j];
+                int dy = y[j-1] - y[j];
+
+                bool adjacent = dx * dx + dy * dy <= 2;
+                if (!adjacent) {
+                    x[j] += sign(dx);
+                    y[j] += sign(dy);
+                }
+
+                if (j == 1) {
+                    hashmap_set(map1, &(Position){ .x=x[j], .y=y[j] });
+                } else if (j == 9) {
+                    hashmap_set(map9, &(Position){ .x=x[j], .y=y[j] });
+                }
+
+                // printf("head now at %ld, %ld\n", hx, hy);
+                // printf("tail now at %ld, %ld\n", tx, ty);
+                // printf("moved %d\n", hashmap_count(map));
             }
-
-            hashmap_set(map, &(Position){ .x=tx, .y=ty });
-
-            // printf("head now at %ld, %ld\n", hx, hy);
-            // printf("tail now at %ld, %ld\n", tx, ty);
-            // printf("moved %d\n", hashmap_count(map));
         }
     }
 
-    printf("moved %zu\n", hashmap_count(map));
+    printf("moved 1 %zu\n", hashmap_count(map1));
+    printf("moved 9 %zu\n", hashmap_count(map9));
 
-    hashmap_free(map);
+    hashmap_free(map1);
+    hashmap_free(map9);
 
     fclose(fp);
     if (line) {
