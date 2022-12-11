@@ -33,9 +33,9 @@ void debug_monkey(Monkey * monkey) {
     printf("divisble %lu if true %zu else %zu\n\n", monkey->divisible, monkey->target_true, monkey->target_false);
 }
 
-void do_monkey(Monkey * monkeys, size_t index) {
+void do_monkey(Monkey * monkeys, size_t index, unsigned long modulo) {
     Monkey *monkey = &monkeys[index];
-    debug_monkey(monkey);
+    // debug_monkey(monkey);
 
     for (int i = 0; i < monkey->items_len; i++) {
         unsigned long item = monkey->items[i];
@@ -47,7 +47,8 @@ void do_monkey(Monkey * monkeys, size_t index) {
             default: assert(0);
         }
 
-        item /= 3;
+        //item /= 3;
+        item = item % modulo;
 
         size_t target_monkey;
         if (item % monkey->divisible == 0) {
@@ -56,7 +57,7 @@ void do_monkey(Monkey * monkeys, size_t index) {
             target_monkey = monkey->target_false;
         }
 
-        printf("   give %lu to monkey %zu\n", item, target_monkey);
+        // printf("   give %lu to monkey %zu\n", item, target_monkey);
 
         monkeys[target_monkey].items[monkeys[target_monkey].items_len] = item;
         monkeys[target_monkey].items_len += 1;
@@ -66,10 +67,10 @@ void do_monkey(Monkey * monkeys, size_t index) {
     monkey->items_len = 0;
 }
 
-void run_round(Monkey * monkeys, size_t monkey_count) {
+void run_round(Monkey * monkeys, size_t monkey_count, unsigned long modulo) {
     for (int i = 0; i < monkey_count; i++) {
-        printf(" monkey %d\n", i);
-        do_monkey(monkeys, i);
+        // printf(" monkey %d\n", i);
+        do_monkey(monkeys, i, modulo);
     }
 }
 
@@ -143,9 +144,14 @@ int main(void)
         debug_monkey(&monkeys[i]);
     }
 
-    for (int i = 0; i < 20; i++) {
-        printf("round %d\n", i + 1);
-        run_round(monkeys, monkey_count);
+    unsigned long modulo = 1;
+    for (int m = 0; m < monkey_count; m++) {
+        modulo *= monkeys[m].divisible;
+    }
+
+    for (int i = 0; i < 10000; i++) {
+        // printf("round %d\n", i + 1);
+        run_round(monkeys, monkey_count, modulo);
     }
 
     printf("\nActivity counts:\n");
