@@ -36,6 +36,50 @@ size_t find_neighbours(size_t pos, size_t* neighbours, char* map) {
     return found;
 }
 
+unsigned int get_dist(char * map, size_t startpos, size_t endpos, size_t * visited_stack, unsigned int * distance) {
+    // move `pos` through map, keep track of previous positions with `visited_stack`
+    size_t pos = startpos;
+    size_t visited_stack_len = 1;
+    visited_stack[0] = startpos;
+
+    // total distance map, inititalize to `INF` at first, except startpos (=0)
+    for (int i = 0; i < TOTAL; i++)
+        distance[i] = INFINITY;
+    distance[startpos] = 0;
+
+    // fill this array with neighbours on map position
+    size_t neighbours[4];
+
+    while (1) {
+        size_t found = find_neighbours(pos, neighbours, map);
+
+        bool stuck = true;
+        for (size_t i = 0; i < found; i++) {
+            size_t neighbour = neighbours[i];
+            if (distance[neighbour] > distance[pos] + 1) {
+                stuck = false;
+
+                // move into this position
+                distance[neighbour] = distance[pos] + 1;
+                pos = neighbours[i];
+                visited_stack[visited_stack_len++] = pos;
+                break;
+            } else {
+                // printf("not visiting %zu again\n", neighbour);
+            }
+        }
+
+        if (stuck) {
+            if (visited_stack_len == 1) {
+                break; // stuck at startpos, we are done
+            }
+            pos = visited_stack[--visited_stack_len - 1];
+        }
+    }
+
+    return distance[endpos];
+}
+
 int main(void)
 {
     FILE * fp;
@@ -88,48 +132,20 @@ int main(void)
     */
     printf("start %zu %c end %zu %c\n", startpos, map[startpos], endpos, map[endpos]);
 
-    // move `pos` through map, keep track of previous positions with `visited_stack`
-    size_t pos = startpos;
-    unsigned int visited_stack[TOTAL] = {startpos};
-    size_t visited_stack_len = 1;
-
-    // total distance map, inititalize to `INF` at first, except startpos (=0)
+    size_t visited_stack[TOTAL] = {startpos};
     unsigned int distance[TOTAL];
-    for (int i = 0; i < TOTAL; i++)
-        distance[i] = INFINITY;
-    distance[startpos] = 0;
+    unsigned int min_dist = INFINITY;
 
-    // fill this array with neighbours on map position
-    size_t neighbours[4];
-
-    while (1) {
-        size_t found = find_neighbours(pos, neighbours, map);
-
-        bool stuck = true;
-        for (size_t i = 0; i < found; i++) {
-            size_t neighbour = neighbours[i];
-            if (distance[neighbour] > distance[pos] + 1) {
-                stuck = false;
-
-                // move into this position
-                distance[neighbour] = distance[pos] + 1;
-                pos = neighbours[i];
-                visited_stack[visited_stack_len++] = pos;
-                break;
-            } else {
-                // printf("not visiting %zu again\n", neighbour);
+    for (size_t i = 0; i < TOTAL; i++) {
+        if (map[i] == 'a') {
+            unsigned int dist = get_dist(map, i, endpos, visited_stack, distance);
+            if (dist < min_dist) {
+                min_dist = dist;
+                printf("min dist from %zu = %u\n", i, min_dist);
             }
-        }
-
-        if (stuck) {
-            if (visited_stack_len == 1) {
-                break; // stuck at startpos, we are done
-            }
-            pos = visited_stack[--visited_stack_len - 1];
         }
     }
 
-    printf("distance to end: %d\n", distance[endpos]);
 
     fclose(fp);
     if (line) {
