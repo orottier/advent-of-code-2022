@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <assert.h>
 
-#define GRID_SIZE 512
+#define GRID_SIZE 1024
 
 void draw(char map[GRID_SIZE][GRID_SIZE], size_t col1, size_t row1, size_t col2, size_t row2) {
     int dc = col1 == col2 ? 0 : (col1 < col2 ? 1 : -1);
@@ -37,13 +37,22 @@ int main(void)
     char map[GRID_SIZE][GRID_SIZE];
     memset(map, '.', GRID_SIZE * GRID_SIZE);
     size_t col1, row1, col2, row2;
+    size_t max_row = 0;;
     int offset, next;
 
     while ((read = getline(&line, &len, fp)) != -1) {
         sscanf(line, "%zu,%zu -> %zu,%zu%n", &col1, &row1, &col2, &row2, &offset);
         draw(map, col1, row1, col2, row2);
+
+        if (row1 > max_row)
+            max_row = row1;
+
         while (sscanf(line + offset, " -> %zu,%zu%n", &col1, &row1, &next) > 1) {
             draw(map, col1, row1, col2, row2);
+
+            if (row1 > max_row)
+                max_row = row1;
+
             col2 = col1;
             row2 = row1;
 
@@ -70,11 +79,15 @@ int main(void)
     }
     */
 
+    size_t floor = max_row + 2;
+    assert(floor < GRID_SIZE);
+    memset(map[floor], '#', GRID_SIZE);
+
     size_t counter = 0;
     while (1) {
         size_t row = 0, col = 500;
         while (1) {
-            assert(col > 0);
+            assert(col > 0 && col < GRID_SIZE);
             if (row >= GRID_SIZE - 1) {
                 goto done;
             }
@@ -93,6 +106,12 @@ int main(void)
                 continue;
             }
             map[row][col] = 'o';
+
+            if (row == 0 && col == 500) {
+                counter++;
+                goto done;
+            }
+
             break;
         }
         counter++;
